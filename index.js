@@ -3,7 +3,6 @@ const http = require('http');
 var Merchant = require('./payment/merchant.js');
 var Bill = require('./payment/bill.js');
 var Creditcard = require('./payment/creditcard.js');
-var Payment = require('./payment/payment.js');
 
 var m = new Merchant();
 var b = new Bill();
@@ -27,9 +26,13 @@ let app = http.createServer((req, res) => {
             res.end('Bem vindo a nossa API');
             break;
         case '/pagamento':
-            p = new Payment();
-            var resposta = p.process(m,b,c);
-            res.end('Opa... a resposta é:' + resposta);
+            
+            var PaymentFinal = require('./payment/processpayment.js');
+            var resposta = PaymentFinal.processPayment(function () {
+                console.log('\nProcessPayment end.');
+            }, false, m,b,c);
+            
+            res.end('Opa... pagamento feito: ' + resposta);
             break;    
         default:
             res.end('Opa.. construindo');

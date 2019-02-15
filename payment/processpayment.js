@@ -4,13 +4,13 @@ var cybersourceRestApi = require('cybersource-rest-client');
 var path = require('path');
 var filePath = path.resolve('config/config.js');
 var configuration = require(filePath);
+var resposta = "";
 
 /**
  * This is a sample code to call PaymentApi,
  * createPayment method will create a new payment
  */
-
-var processPayment = function (callback, enableCapture) {
+function processPayment(callback, enableCapture, merchant, bill, creditcard) {
 	try {
 		var configObject = new configuration();
 		var instance = new cybersourceRestApi.PaymentsApi(configObject);
@@ -22,16 +22,16 @@ var processPayment = function (callback, enableCapture) {
 		processingInformation.commerceIndicator = 'internet';
 
 		var subMerchant = new cybersourceRestApi.Ptsv2paymentsAggregatorInformationSubMerchant();
-		subMerchant.cardAcceptorId = '1234567890';
-		subMerchant.country = 'US';
-		subMerchant.phoneNumber = '4158880000';
-		subMerchant.address1 = '1 Market St';
-		subMerchant.postalCode = '94105';
-		subMerchant.locality = 'San Francisco';
-		subMerchant.name = 'Visa Inc';
-		subMerchant.administrativeArea = 'CA';
-		subMerchant.region = 'PEN';
-		subMerchant.email = 'test@cybs.com';
+		subMerchant.cardAcceptorId = merchant.cardAcceptorId;
+		subMerchant.country = merchant.country;
+		subMerchant.phoneNumber = merchant.phoneNumber;
+		subMerchant.address1 = merchant.address1;
+		subMerchant.postalCode = merchant.postalCode;
+		subMerchant.locality = merchant.locality;
+		subMerchant.name = merchant.name;
+		subMerchant.administrativeArea = merchant.administrativeArea;
+		subMerchant.region = merchant.region;
+		subMerchant.email = merchant.email;
 
 		var aggregatorInformation = new cybersourceRestApi.Ptsv2paymentsAggregatorInformation();
 		aggregatorInformation.subMerchant = subMerchant;
@@ -39,23 +39,23 @@ var processPayment = function (callback, enableCapture) {
 		aggregatorInformation.aggregatorId = '123456789';
 
 		var amountDetails = new cybersourceRestApi.Ptsv2paymentsOrderInformationAmountDetails();
-		amountDetails.totalAmount = '102.21';
-		amountDetails.currency = 'USD';
+		amountDetails.totalAmount = bill.totalAmount;
+		amountDetails.currency = bill.currency;
 
 		var billTo = new cybersourceRestApi.Ptsv2paymentsOrderInformationBillTo();
-		billTo.country = 'US';
-		billTo.firstName = 'John';
-		billTo.lastName = 'Deo';
-		billTo.phoneNumber = '4158880000';
-		billTo.address1 = 'test';
-		billTo.postalCode = '94105';
-		billTo.locality = 'San Francisco';
-		billTo.administrativeArea = 'MI';
-		billTo.email = 'test@cybs.com';
-		billTo.address2 = 'Address 2';
-		billTo.district = 'MI';
-		billTo.buildingNumber = '123';
-		billTo.company = 'Visa';
+		billTo.country = bill.country;
+		billTo.firstName = bill.firstName;
+		billTo.lastName = bill.lastName;
+		billTo.phoneNumber = bill.phoneNumber;
+		billTo.address1 = bill.address1;
+		billTo.postalCode = bill.postalCode;
+		billTo.locality = bill.locality;
+		billTo.administrativeArea = bill.administrativeArea;
+		billTo.email = bill.email;
+		billTo.address2 = bill.address2;
+		billTo.district = bill.district;
+		billTo.buildingNumber = bill.buildingNumber;
+		billTo.company = bill.company;
 
 		var orderInformation = new cybersourceRestApi.Ptsv2paymentsOrderInformation();
 		orderInformation.amountDetails = amountDetails;
@@ -63,11 +63,11 @@ var processPayment = function (callback, enableCapture) {
 
 		var paymentInformation = new cybersourceRestApi.Ptsv2paymentsPaymentInformation();
 		var card = new cybersourceRestApi.Ptsv2paymentsPaymentInformationCard();
-		card.expirationYear = '2031';
-		card.number = '4111111111111111';
-		card.expirationMonth = '03';
-		card.securityCode = '123';
-		card.type = '001';
+		card.expirationYear = creditcard.expirationYear;
+		card.number = creditcard.number;
+		card.expirationMonth = creditcard.expirationMonth;
+		card.securityCode = creditcard.securityCode;
+		card.type = creditcard.type;
 		paymentInformation.card = card;
 
 		var request = new cybersourceRestApi.CreatePaymentRequest();
@@ -92,14 +92,16 @@ var processPayment = function (callback, enableCapture) {
 			console.log('\nResponse of process a payment : ' + JSON.stringify(response));
 			console.log('\nResponse Code of process a payment : ' + JSON.stringify(response['status']));
 			callback(error, data);
+			resposta = JSON.stringify(data.status);
 		});
+	return resposta;
 	} catch (error) {
 		console.log(error);
 	}
 }
-if (require.main === module) {
-	processPayment(function () {
-		console.log('\nProcessPayment end.');
-	}, false);
-}
-module.exports = processPayment;
+// if (require.main === module) {
+// 	processPayment(function () {
+// 		console.log('\nProcessPayment end.');
+// 	}, false);
+// }
+module.exports.processPayment = processPayment;
