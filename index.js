@@ -32,6 +32,10 @@ let app = http.createServer((req, res) => {
                 console.log('\nProcessPayment end.');
             }, false, m,b,c);
             
+            response.writeHead(302, {
+                'Location': 'http://localhost/visafront/pages/icons.html?status=ok'
+                //add other headers here...
+              });
             res.end('Opa... pagamento feito: ' + resposta);
             break;    
         default:
@@ -42,7 +46,7 @@ let app = http.createServer((req, res) => {
     }
     
       else if (req.method == 'POST') {
-        res.end('Opa.. trabalhando no post');
+        res.end('Opa.. trabalhando no post  ');
       }
     
       else {
