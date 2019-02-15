@@ -31,15 +31,13 @@ let app = http.createServer((req, res) => {
             var resposta = PaymentFinal.processPayment(function () {
                 console.log('\nProcessPayment end.');
             }, false, m,b,c);
-            
-            response.writeHead(302, {
-                'Location': 'http://localhost/visafront/pages/icons.html?status=ok'
-                //add other headers here...
-              });
-            res.end('Opa... pagamento feito: ' + resposta);
+                  
+            res.end("Resposta do Pagamento: " + resposta);
+  
             break;    
         default:
             res.end('Opa.. construindo');
+            break;
         }
 
 
